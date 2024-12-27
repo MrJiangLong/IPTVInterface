@@ -18,6 +18,10 @@ jobs:
             - name: Checkout target repo
               uses: actions/checkout@v3
 
+            - name: Checkout master branch
+              run: |
+                git checkout master
+                
             - name: Sync Upstream for master
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
@@ -27,6 +31,10 @@ jobs:
                   target_sync_branch: master
                   test_mode: false
 
+            - name: Checkout dev branch
+              run: |
+                git checkout dev
+                
             - name: Sync Upstream for dev
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
@@ -35,7 +43,11 @@ jobs:
                   upstream_sync_branch: dev
                   target_sync_branch: dev
                   test_mode: false
-                  
+
+            - name: Checkout gd branch
+              run: |
+                git checkout gd
+                
             - name: Sync Upstream for gd
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
