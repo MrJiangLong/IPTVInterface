@@ -1,34 +1,39 @@
 name: Sync Fork
 
 permissions:
-    contents: write
+  contents: write
 
 on:
-    schedule:
-        - cron: '0 0 * * *'  # 每天的午夜（UTC时间）执行
-    workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # 每天的午夜（UTC时间）执行
+  workflow_dispatch:
 
 jobs:
-    sync_with_upstream:
-        name: Sync with Upstream
-        runs-on: ubuntu-latest
-        if: ${{ github.event.repository.fork }}
+  sync_with_upstream:
+    name: Sync with Upstream
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
 
-        steps:
-            - name: Checkout target repo
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 确保获取所有分支的历史记录
 
-            - name: Sync Upstream for gd
-              uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
-              with:
-                  target_repo_token: ${{ secrets.MY_GITHUB_TOKEN }}
-                  upstream_sync_repo: Guovin/iptv-api
-                  upstream_sync_branch: gd
-                  target_sync_branch: gd
-                  test_mode: false
+      - name: Sync Upstream for master
+        run: |
+          git checkout master  # 检出 master 分支
+          git pull upstream master  # 从 upstream 拉取更新
+          git push origin master  # 推送到 fork 的 master 分支
 
-            - name: Check for Failure
-              if: failure()
-              run: |
-                  echo "[Error] Due to a change in the workflow file of the upstream repository, GitHub has automatically suspended the scheduled automatic update. You need to manually sync your fork."
-                  exit 1
+      - name: Sync Upstream for dev
+        run: |
+          git checkout dev  # 检出 develop 分支
+          git pull upstream dev  # 从 upstream 拉取更新
+          git push origin dev  # 推送到 fork 的 develop 分支
+
+      - name: Check for Failure
+        if: failure()
+        run: |
+          echo "[Error] Sync failed. Please check the logs for details."
+          exit 1
