@@ -34,7 +34,7 @@ jobs:
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: dev
                   target_sync_branch: dev
-                  test_mode: false
+                  test_mode: true
 
             - name: Sync Upstream for gd
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
