@@ -21,6 +21,7 @@ jobs:
             - name: Sync Upstream for master
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
+                  ref: master
                   target_repo_token: ${{ secrets.MY_GITHUB_TOKEN }}
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: master
@@ -30,15 +31,17 @@ jobs:
             - name: Sync Upstream for dev
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
+                  ref: dev
                   target_repo_token: ${{ secrets.MY_GITHUB_TOKEN }}
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: dev
                   target_sync_branch: dev
-                  test_mode: true
+                  test_mode: false
 
             - name: Sync Upstream for gd
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
+                  ref: gd
                   target_repo_token: ${{ secrets.MY_GITHUB_TOKEN }}
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: gd
