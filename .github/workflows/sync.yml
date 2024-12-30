@@ -18,13 +18,13 @@ jobs:
             - name: Checkout target repo
               uses: actions/checkout@v3
               with:
-                github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+                token: ${{ secrets.MY_GITHUB_TOKEN }}
                 fetch-depth: 0 
                 
             - name: Sync Upstream for master
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
-                  github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+                  token: ${{ secrets.MY_GITHUB_TOKEN }}
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: master
                   target_sync_branch: master
@@ -33,7 +33,7 @@ jobs:
             - name: Sync Upstream for dev
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
-                  github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+                  token: ${{ secrets.MY_GITHUB_TOKEN }}
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: dev
                   target_sync_branch: dev
@@ -42,7 +42,7 @@ jobs:
             - name: Sync Upstream for gd
               uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
               with:
-                  github_token: ${{ secrets.MY_GITHUB_TOKEN }}
+                  token: ${{ secrets.MY_GITHUB_TOKEN }}
                   upstream_sync_repo: Guovin/iptv-api
                   upstream_sync_branch: gd
                   target_sync_branch: gd
