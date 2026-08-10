@@ -1,9 +1,10 @@
 import os
 import unittest
+from unittest.mock import patch
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication, QStackedWidget, QWidget
+from PySide6.QtWidgets import QApplication, QMessageBox, QStackedWidget, QWidget
 from qfluentwidgets import FluentIcon, NavigationPushButton
 
 from desktop_ui.pages.about import AboutPage
@@ -47,6 +48,30 @@ class NavigationStatusIndicatorTests(unittest.TestCase):
 
         self.assertEqual(statuses[-1], ("available", {"version": "9.9.9"}))
 
+    def test_about_page_displays_hotfix_revision(self):
+        page = AboutPage()
+        self.addCleanup(page.deleteLater)
+        statuses = []
+        page.status_changed.connect(lambda state, payload: statuses.append((state, payload)))
+
+        page._checked({
+            "newer": True,
+            "latest": "3.0.0",
+            "latest_revision": 20260810123045,
+            "current": "3.0.0",
+            "release_url": "https://example.com/release",
+            "asset_url": "https://example.com/hotfix.zip",
+            "asset_name": "hotfix.zip",
+        })
+
+        self.assertEqual(
+            statuses[-1],
+            ("available", {"version": "3.0.0 (r20260810123045)"}),
+        )
+        self.assertIn("r20260810123045", page.version_status.text())
+        page.retranslate()
+        self.assertIn("r20260810123045", page.version_status.text())
+
     def test_about_page_silently_ignores_automatic_check_failure(self):
         page = AboutPage()
         statuses = []
@@ -69,6 +94,27 @@ class NavigationStatusIndicatorTests(unittest.TestCase):
         dialog = ChangelogDialog(str(page.info.get("version")), page)
         self.addCleanup(dialog.deleteLater)
         self.assertIn("v3.0.0", dialog.viewer.toPlainText())
+
+    def test_update_install_dialog_tracks_app_language_and_theme(self):
+        language = get_language()
+        self.addCleanup(set_language, language)
+        page = AboutPage()
+        self.addCleanup(page.deleteLater)
+
+        set_language("en")
+        dialog = page._install_confirmation_dialog()
+        self.addCleanup(dialog.deleteLater)
+        self.assertEqual(dialog.button(QMessageBox.StandardButton.Yes).text(), "Yes")
+        self.assertEqual(dialog.button(QMessageBox.StandardButton.No).text(), "No")
+        self.assertIn("The app will quit", dialog.text())
+
+        set_language("zh_CN")
+        with patch("desktop_ui.widgets.isDarkTheme", return_value=True):
+            dialog = page._install_confirmation_dialog()
+        self.addCleanup(dialog.deleteLater)
+        self.assertEqual(dialog.button(QMessageBox.StandardButton.Yes).text(), "是")
+        self.assertEqual(dialog.button(QMessageBox.StandardButton.No).text(), "否")
+        self.assertIn("#202020", dialog.styleSheet())
 
     def test_changelog_extracts_only_the_current_release_and_language(self):
         markdown = """## v2.0.8
